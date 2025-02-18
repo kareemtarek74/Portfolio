@@ -7,8 +7,9 @@ import 'package:kareem_portfolio/widgets/site_logo.dart';
 class HeaderDesktop extends StatelessWidget {
   const HeaderDesktop({
     super.key,
+    required this.onNavMenuClicked,
   });
-
+  final Function(int) onNavMenuClicked;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -24,7 +25,9 @@ class HeaderDesktop extends StatelessWidget {
           Spacer(),
           for (int i = 0; i < navTitles.length; i++)
             TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  onNavMenuClicked(i);
+                },
                 child: Text(
                   navTitles[i],
                   style: TextStyle(

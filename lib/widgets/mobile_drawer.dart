@@ -5,7 +5,9 @@ import 'package:kareem_portfolio/constants/nav_items.dart';
 class MobileDrawer extends StatelessWidget {
   const MobileDrawer({
     super.key,
+    required this.onNavItemClicked,
   });
+  final Function(int) onNavItemClicked;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +36,9 @@ class MobileDrawer extends StatelessWidget {
                   color: CustomColor.whitePrimary,
                   fontWeight: FontWeight.w600,
                   fontSize: 16),
-              onTap: () {},
+              onTap: () {
+                onNavItemClicked(i);
+              },
             )
         ],
       ),

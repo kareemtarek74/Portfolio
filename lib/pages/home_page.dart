@@ -22,6 +22,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
+  final ScrollController scrollController = ScrollController();
+  final List<GlobalKey> navBarKeys = List.generate(4, (index) => GlobalKey());
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.sizeOf(context);
@@ -31,65 +33,115 @@ class _HomePageState extends State<HomePage> {
         key: scaffoldKey,
         endDrawer: Constraints.maxWidth >= kMinDisktopWidth
             ? null
-            : const MobileDrawer(),
-        backgroundColor: CustomColor.scaffoldBg,
-        body: ListView(
-          scrollDirection: Axis.vertical,
-          children: [
-            //main
-            if (Constraints.maxWidth >= kMinDisktopWidth)
-              const HeaderDesktop()
-            else
-              HeaderMobile(
-                onLogoTap: () {},
-                onMenuTap: () {
-                  scaffoldKey.currentState?.openEndDrawer();
+            : MobileDrawer(
+                onNavItemClicked: (int navIndex) {
+                  scaffoldKey.currentState?.closeEndDrawer();
+                  scrollToSection(navIndex);
                 },
               ),
-            if (Constraints.maxWidth >= kMinDisktopWidth)
-              MainDeskTop(screenSize: screenSize, screenWidth: screenWidth)
-            else
-              MainMobile(screenSize: screenSize, screenWidth: screenWidth),
-            //skills
-            Container(
-              width: screenWidth,
-              color: CustomColor.bgLightk,
-              padding: EdgeInsets.fromLTRB(25, 20, 25, 60),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'What I can do',
-                    style: TextStyle(
-                        fontSize: 18.sp,
-                        fontWeight: FontWeight.bold,
-                        color: CustomColor.whitePrimary),
-                  ),
-                  SizedBox(
-                    height: 50,
-                  ),
-                  if (Constraints.maxWidth >= kMedDisktopWidth)
-                    SkillsDeskTop()
-                  else
-                    SkillsMobile()
-                ],
+        backgroundColor: CustomColor.scaffoldBg,
+        body: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          controller: scrollController,
+          child: Column(
+            children: [
+              SizedBox(
+                key: navBarKeys.first,
               ),
-            ),
-            //projects
-            SizedBox(
-              height: 20,
-            ),
-            ProjectsSection(screenWidth: screenWidth),
-            // contact
-            SizedBox(
-              height: 20,
-            ),
-            ContactSection(),
-            //footer
-            FooterSection(),
-          ],
+              //main
+              if (Constraints.maxWidth >= kMinDisktopWidth)
+                HeaderDesktop(
+                  onNavMenuClicked: (int navIndex) {
+                    scrollToSection(navIndex);
+                  },
+                )
+              else
+                HeaderMobile(
+                  onLogoTap: () {},
+                  onMenuTap: () {
+                    scaffoldKey.currentState?.openEndDrawer();
+                  },
+                ),
+              if (Constraints.maxWidth >= kMinDisktopWidth)
+                MainDeskTop(
+                  screenSize: screenSize,
+                  screenWidth: screenWidth,
+                  onPressed: () {
+                    scrollToSection(3);
+                  },
+                )
+              else
+                MainMobile(
+                  screenSize: screenSize,
+                  screenWidth: screenWidth,
+                  onPressed: () => scrollToSection(3),
+                ),
+              //skills
+              Container(
+                key: navBarKeys[1],
+                width: screenWidth,
+                color: CustomColor.bgLightk,
+                padding: EdgeInsets.fromLTRB(25, 20, 25, 60),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'What I can do',
+                      style: TextStyle(
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.bold,
+                          color: CustomColor.whitePrimary),
+                    ),
+                    SizedBox(
+                      height: 50,
+                    ),
+                    if (Constraints.maxWidth >= kMedDisktopWidth)
+                      SkillsDeskTop()
+                    else
+                      SkillsMobile()
+                  ],
+                ),
+              ),
+              //projects
+              SizedBox(
+                height: 20,
+              ),
+              ProjectsSection(
+                screenWidth: screenWidth,
+                key: navBarKeys[2],
+              ),
+              // contact
+              SizedBox(
+                height: 20,
+              ),
+              ContactSection(
+                key: navBarKeys[3],
+              ),
+              //footer
+              FooterSection(),
+            ],
+          ),
         ),
       );
     });
+  }
+
+  void scrollToSection(int navIndex) {
+    if (navIndex == 4) return;
+
+    final key = navBarKeys[navIndex];
+    final context = key.currentContext;
+
+    if (context != null) {
+      final renderObject = context.findRenderObject();
+      if (renderObject is RenderBox) {
+        final position = renderObject.localToGlobal(Offset.zero).dy;
+        scrollController.animateTo(
+          position + scrollController.offset,
+          duration: Duration(milliseconds: 600),
+          curve: Curves.easeInOutCubic,
+        );
+      }
+    }
   }
 }
