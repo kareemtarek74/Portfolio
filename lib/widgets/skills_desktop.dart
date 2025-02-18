@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:kareem_portfolio/constants/app_colors.dart';
 import 'package:kareem_portfolio/constants/skills_items.dart';
+import 'package:kareem_portfolio/widgets/skills_languages.dart';
 
 class SkillsDeskTop extends StatelessWidget {
   const SkillsDeskTop({
@@ -45,26 +46,8 @@ class SkillsDeskTop extends StatelessWidget {
         ),
         Flexible(
           child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: 430),
-            child: Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              children: [
-                for (int i = 0; i < skillsItems.length; i++)
-                  Chip(
-                    side: BorderSide.none,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(100)),
-                    backgroundColor: CustomColor.bgLight2,
-                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                    label: Text(skillsItems[i]["title"]),
-                    avatar: Image.asset(
-                      skillsItems[i]["img"],
-                    ),
-                  )
-              ],
-            ),
-          ),
+              constraints: BoxConstraints(maxWidth: 430),
+              child: SkillsLanguages()),
         )
       ],
     );

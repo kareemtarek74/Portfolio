@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kareem_portfolio/constants/app_colors.dart';
+import 'package:kareem_portfolio/widgets/main_button.dart';
 import 'package:sizer/sizer.dart';
 
 class MainMobile extends StatelessWidget {
@@ -15,7 +16,7 @@ class MainMobile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: screenSize.height,
+      height: screenSize.height / 1.5,
       constraints: BoxConstraints(minHeight: 560),
       margin: EdgeInsets.symmetric(horizontal: 40, vertical: 30),
       child: Column(
@@ -47,17 +48,7 @@ class MainMobile extends StatelessWidget {
           SizedBox(
             height: 15,
           ),
-          SizedBox(
-            width: screenWidth * .30,
-            height: 50,
-            child: ElevatedButton(
-                onPressed: () {},
-                child: Text(
-                  "Get in touch",
-                  style: TextStyle(
-                      fontSize: 13.sp, color: CustomColor.whitePrimary),
-                )),
-          ),
+          SizedBox(width: screenWidth * .30, height: 50, child: MainButton()),
         ],
       ),
     );

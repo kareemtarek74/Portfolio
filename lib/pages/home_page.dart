@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:kareem_portfolio/constants/app_colors.dart';
 import 'package:kareem_portfolio/constants/sizes.dart';
+import 'package:kareem_portfolio/widgets/contact_section.dart';
+import 'package:kareem_portfolio/widgets/footer_section.dart';
 import 'package:kareem_portfolio/widgets/header_desktop.dart';
 import 'package:kareem_portfolio/widgets/header_mobile.dart';
 import 'package:kareem_portfolio/widgets/main_desktop.dart';
 import 'package:kareem_portfolio/widgets/main_mobile.dart';
 import 'package:kareem_portfolio/widgets/mobile_drawer.dart';
+import 'package:kareem_portfolio/widgets/projects_section.dart';
 import 'package:kareem_portfolio/widgets/skills_desktop.dart';
+import 'package:kareem_portfolio/widgets/skills_mobile.dart';
 import 'package:sizer/sizer.dart';
 
 class HomePage extends StatefulWidget {
@@ -64,21 +68,25 @@ class _HomePageState extends State<HomePage> {
                   SizedBox(
                     height: 50,
                   ),
-                  SkillsDeskTop()
+                  if (Constraints.maxWidth >= kMedDisktopWidth)
+                    SkillsDeskTop()
+                  else
+                    SkillsMobile()
                 ],
               ),
             ),
             //projects
-            const SizedBox(
-              height: 500,
-              width: double.maxFinite,
+            SizedBox(
+              height: 20,
             ),
+            ProjectsSection(screenWidth: screenWidth),
+            // contact
+            SizedBox(
+              height: 20,
+            ),
+            ContactSection(),
             //footer
-            Container(
-              height: 500,
-              width: double.maxFinite,
-              color: Colors.blueGrey,
-            ),
+            FooterSection(),
           ],
         ),
       );

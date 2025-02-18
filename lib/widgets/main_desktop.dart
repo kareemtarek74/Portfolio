@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kareem_portfolio/constants/app_colors.dart';
+import 'package:kareem_portfolio/widgets/main_button.dart';
 import 'package:sizer/sizer.dart';
 
 class MainDeskTop extends StatelessWidget {
@@ -34,13 +34,7 @@ class MainDeskTop extends StatelessWidget {
               SizedBox(
                 width: screenWidth * .25,
                 height: 50,
-                child: ElevatedButton(
-                    onPressed: () {},
-                    child: Text(
-                      "Get in touch",
-                      style: TextStyle(
-                          fontSize: 13.sp, color: CustomColor.whitePrimary),
-                    )),
+                child: MainButton(),
               ),
             ],
           ),
