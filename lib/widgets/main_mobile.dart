@@ -56,7 +56,7 @@ class MainMobileState extends State<MainMobile> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: widget.screenSize.height / 1.5,
+      height: widget.screenSize.height / 2,
       constraints: BoxConstraints(minHeight: 560),
       margin: EdgeInsets.symmetric(horizontal: 40, vertical: 30),
       child: Column(
@@ -100,10 +100,11 @@ class MainMobileState extends State<MainMobile> with TickerProviderStateMixin {
           ),
           SizedBox(height: 15),
           SizedBox(
-              width: widget.screenWidth * .30,
+              width: widget.screenWidth * .39,
               height: 50,
               child: MainButton(
                 onPressed: widget.onPressed,
+                fontSize: 14.sp,
               )),
         ],
       ),

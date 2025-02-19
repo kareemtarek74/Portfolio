@@ -3,8 +3,8 @@ import 'package:kareem_portfolio/constants/app_colors.dart';
 
 class MainButton extends StatefulWidget {
   final VoidCallback? onPressed;
-
-  const MainButton({super.key, this.onPressed});
+  final double fontSize;
+  const MainButton({super.key, this.onPressed, required this.fontSize});
 
   @override
   MainButtonState createState() => MainButtonState();
@@ -52,7 +52,9 @@ class MainButtonState extends State<MainButton> {
           child: Text(
             "Get in touch",
             style: TextStyle(
-                color: CustomColor.whitePrimary, fontWeight: FontWeight.bold),
+                color: CustomColor.whitePrimary,
+                fontWeight: FontWeight.bold,
+                fontSize: widget.fontSize),
           ),
         ),
       ),

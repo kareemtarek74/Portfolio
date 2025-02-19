@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kareem_portfolio/constants/app_colors.dart';
+import 'package:sizer/sizer.dart';
 
 class FooterSection extends StatelessWidget {
   const FooterSection({
@@ -15,7 +16,9 @@ class FooterSection extends StatelessWidget {
       child: Text(
         "Made by Kareem Tarek with Flutter",
         style: TextStyle(
-            fontWeight: FontWeight.w400, color: CustomColor.whiteSecondary),
+            fontWeight: FontWeight.w400,
+            color: CustomColor.whiteSecondary,
+            fontSize: 13.sp),
       ),
     );
   }

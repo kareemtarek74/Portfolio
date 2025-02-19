@@ -89,6 +89,7 @@ class MainDeskTopState extends State<MainDeskTop>
                       height: 50,
                       child: MainButton(
                         onPressed: widget.onPressed,
+                        fontSize: 12.sp,
                       ),
                     ),
                   ),

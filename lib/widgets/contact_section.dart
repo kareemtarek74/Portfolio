@@ -9,6 +9,7 @@ import 'package:kareem_portfolio/constants/sizes.dart';
 import 'package:kareem_portfolio/constants/sms_links.dart';
 import 'package:kareem_portfolio/widgets/custom_text_field.dart';
 import 'package:kareem_portfolio/widgets/main_button.dart';
+import 'package:sizer/sizer.dart';
 
 class ContactSection extends StatefulWidget {
   const ContactSection({
@@ -119,7 +120,7 @@ class _ContactSectionState extends State<ContactSection> {
             "Get In Touch",
             style: TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: 24,
+                fontSize: 18.sp,
                 color: CustomColor.whitePrimary),
           ),
           SizedBox(height: 50),
@@ -179,6 +180,7 @@ class _ContactSectionState extends State<ContactSection> {
                           ? Center(child: CircularProgressIndicator())
                           : MainButton(
                               onPressed: _sendMessage,
+                              fontSize: 14.sp,
                             )),
                 ),
               ],
