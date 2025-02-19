@@ -2,7 +2,6 @@ class ValidationUtils {
   static bool isValidEmail(String email) {
     if (email.trim().isEmpty) return false;
 
-    // تعبير منتظم قوي للتحقق من صحة البريد الإلكتروني
     final RegExp emailRegex = RegExp(
       r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$',
       caseSensitive: false,
@@ -21,7 +20,6 @@ class ValidationUtils {
   }
 
   static bool containsNoSpecialChars(String text) {
-    // يسمح فقط بالأحرف والأرقام والمسافات
     final RegExp allowedChars = RegExp(r'^[a-zA-Z0-9\s]+$');
     return allowedChars.hasMatch(text);
   }

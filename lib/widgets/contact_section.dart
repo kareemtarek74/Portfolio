@@ -39,7 +39,6 @@ class _ContactSectionState extends State<ContactSection> {
   }
 
   Future<void> sendMessage() async {
-    // Validate inputs
     if (nameController.text.trim().isEmpty) {
       setState(() {
         errorMessage = "Please enter your name";
