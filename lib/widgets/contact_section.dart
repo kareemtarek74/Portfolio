@@ -1,12 +1,12 @@
-import 'dart:convert';
-import 'dart:js' as js;
-
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:http/http.dart' as http;
 import 'package:kareem_portfolio/constants/app_colors.dart';
 import 'package:kareem_portfolio/constants/sizes.dart';
-import 'package:kareem_portfolio/constants/sms_links.dart';
+import 'package:kareem_portfolio/services/email_service.dart'; // We'll create this file
+import 'package:kareem_portfolio/utils/validation_utils.dart'; // We'll create this file
+import 'package:kareem_portfolio/widgets/build_name_and_email_desktop.dart';
+import 'package:kareem_portfolio/widgets/build_name_and_email_mobile.dart';
+import 'package:kareem_portfolio/widgets/build_social_links.dart';
+import 'package:kareem_portfolio/widgets/build_success_message.dart';
 import 'package:kareem_portfolio/widgets/custom_text_field.dart';
 import 'package:kareem_portfolio/widgets/main_button.dart';
 import 'package:sizer/sizer.dart';
@@ -21,90 +21,77 @@ class ContactSection extends StatefulWidget {
 }
 
 class _ContactSectionState extends State<ContactSection> {
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _messageController = TextEditingController();
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController messageController = TextEditingController();
 
-  bool _isLoading = false;
-  String? _errorMessage;
-  bool _messageSent = false;
+  bool isLoading = false;
+  String? errorMessage;
+  bool messageSent = false;
+  final EmailService emailService = EmailService();
 
   @override
   void dispose() {
-    _nameController.dispose();
-    _emailController.dispose();
-    _messageController.dispose();
+    nameController.dispose();
+    emailController.dispose();
+    messageController.dispose();
     super.dispose();
   }
 
-  bool _validateEmail(String email) {
-    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-    return emailRegex.hasMatch(email);
-  }
-
-  Future<void> _sendMessage() async {
-    if (_nameController.text.isEmpty) {
+  Future<void> sendMessage() async {
+    // Validate inputs
+    if (nameController.text.trim().isEmpty) {
       setState(() {
-        _errorMessage = "Please enter your name";
+        errorMessage = "Please enter your name";
       });
       return;
     }
 
-    if (_emailController.text.isEmpty ||
-        !_validateEmail(_emailController.text)) {
+    if (!ValidationUtils.isValidEmail(emailController.text)) {
       setState(() {
-        _errorMessage = "Please enter a valid email";
+        errorMessage = "Please enter a valid email";
       });
       return;
     }
 
-    if (_messageController.text.isEmpty) {
+    if (messageController.text.trim().isEmpty) {
       setState(() {
-        _errorMessage = "Please enter your message";
+        errorMessage = "Please enter your message";
       });
       return;
     }
 
     setState(() {
-      _isLoading = true;
-      _errorMessage = null;
+      isLoading = true;
+      errorMessage = null;
     });
 
     try {
-      final url = Uri.parse('https://api.emailjs.com/api/v1.0/email/send');
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          'service_id': 'service_ly647ch',
-          'template_id': 'template_ls566ki',
-          'user_id': 'E-X8YNp5nMjNKyVyA',
-          'template_params': {
-            'name': _nameController.text,
-            'email': _emailController.text,
-            'message': _messageController.text,
-          }
-        }),
+      final result = await emailService.sendContactEmail(
+        name: nameController.text.trim(),
+        email: emailController.text.trim(),
+        message: messageController.text.trim(),
       );
 
-      if (response.statusCode == 200) {
+      if (result.success) {
         setState(() {
-          _messageSent = true;
-          _isLoading = false;
-          _nameController.clear();
-          _emailController.clear();
-          _messageController.clear();
+          messageSent = true;
+          isLoading = false;
+          nameController.clear();
+          emailController.clear();
+          messageController.clear();
         });
       } else {
         setState(() {
-          _errorMessage = "Failed to send message. Please try again.";
-          _isLoading = false;
+          errorMessage = result.errorMessage ??
+              "Failed to send message. Please try again.";
+          isLoading = false;
         });
       }
     } catch (e) {
       setState(() {
-        _errorMessage = "An error occurred. Please try again later.";
-        _isLoading = false;
+        errorMessage = "An error occurred. Please try again later.";
+        isLoading = false;
       });
     }
   }
@@ -120,145 +107,67 @@ class _ContactSectionState extends State<ContactSection> {
             "Get In Touch",
             style: TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: 18.sp,
+                fontSize: 24,
                 color: CustomColor.whitePrimary),
           ),
           SizedBox(height: 50),
-          if (_messageSent)
-            Container(
-              padding: EdgeInsets.all(16),
-              margin: EdgeInsets.only(bottom: 20),
-              decoration: BoxDecoration(
-                color: Colors.green.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                "Thank you! Your message has been sent successfully. I'll get back to you soon in your gmail.",
-                style: TextStyle(color: Colors.green[700]),
-                textAlign: TextAlign.center,
-              ),
-            )
-          else
-            Column(
-              children: [
-                ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: 700, maxHeight: 100),
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      if (constraints.maxWidth >= kMinDisktopWidth) {
-                        return buildNameAndEmailFieldsDesktop();
-                      } else {
-                        return buildNameAndEmailFieldsMobile();
-                      }
-                    },
-                  ),
-                ),
-                SizedBox(height: 15),
-                ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: 700),
-                  child: CustomTextField(
-                    hintText: "Your Message",
-                    maxLines: 13,
-                    controller: _messageController,
-                  ),
-                ),
-                if (_errorMessage != null)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: Text(
-                      _errorMessage!,
-                      style: TextStyle(color: Colors.red[400], fontSize: 14),
-                    ),
-                  ),
-                SizedBox(height: 20),
-                ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: 700),
-                  child: SizedBox(
-                      width: double.maxFinite,
-                      height: 40,
-                      child: _isLoading
-                          ? Center(child: CircularProgressIndicator())
-                          : MainButton(
-                              onPressed: _sendMessage,
-                              fontSize: 14.sp,
-                            )),
-                ),
-              ],
-            ),
+          if (messageSent) buildSuccessMessage() else buildContactForm(),
           SizedBox(height: 30),
           ConstrainedBox(
               constraints: BoxConstraints(maxWidth: 300), child: Divider()),
           SizedBox(height: 15),
-          Wrap(
-            spacing: 15,
-            runSpacing: 15,
-            alignment: WrapAlignment.center,
-            children: [
-              buildSocialIcon(
-                  "assets/images/Gmail.svg", SmsLinks.gmailLink, 24),
-              buildSocialIcon(
-                  "assets/images/whatsapp.svg", SmsLinks.whatsappLink, 28),
-              buildSocialIcon(
-                  "assets/images/github.svg", SmsLinks.githubLink, 28),
-              buildSocialIcon(
-                  "assets/images/linkedin.svg", SmsLinks.linkedinLink, 28),
-              buildSocialIcon(
-                  "assets/images/instgram.svg", SmsLinks.instagramLink, 27),
-            ],
-          )
+          buildSocialLinks(),
         ],
       ),
     );
   }
 
-  Widget buildSocialIcon(String assetPath, String link, double height) {
-    return InkWell(
-      onTap: () {
-        js.context.callMethod("open", [link]);
-      },
-      child: SvgPicture.asset(
-        assetPath,
-        height: height,
-        width: height,
-      ),
-    );
-  }
-
-  Row buildNameAndEmailFieldsDesktop() {
-    return Row(
-      children: [
-        Flexible(
-          child: CustomTextField(
-            hintText: "Your Name",
-            controller: _nameController,
-          ),
-        ),
-        SizedBox(width: 15),
-        Flexible(
-          child: CustomTextField(
-            hintText: "Your Email",
-            controller: _emailController,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Column buildNameAndEmailFieldsMobile() {
+  Widget buildContactForm() {
     return Column(
       children: [
-        Flexible(
-          child: CustomTextField(
-            hintText: "Your Name",
-            controller: _nameController,
+        ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: 700, maxHeight: 100),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              if (constraints.maxWidth >= kMinDisktopWidth) {
+                return buildNameAndEmailFieldsDesktop(
+                    nameController, emailController);
+              } else {
+                return buildNameAndEmailFieldsMobile(
+                    nameController, emailController);
+              }
+            },
           ),
         ),
         SizedBox(height: 15),
-        Flexible(
+        ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: 700),
           child: CustomTextField(
-            hintText: "Your Email",
-            controller: _emailController,
+            hintText: "Your Message",
+            maxLines: 13,
+            controller: messageController,
           ),
+        ),
+        if (errorMessage != null)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Text(
+              errorMessage!,
+              style: TextStyle(color: Colors.red[400], fontSize: 14),
+            ),
+          ),
+        SizedBox(height: 20),
+        ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: 700),
+          child: SizedBox(
+              width: double.maxFinite,
+              height: 40,
+              child: isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : MainButton(
+                      fontSize: 13.sp,
+                      onPressed: sendMessage,
+                    )),
         ),
       ],
     );
