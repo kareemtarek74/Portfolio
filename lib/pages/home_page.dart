@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kareem_portfolio/constants/app_colors.dart';
+import 'package:kareem_portfolio/constants/app_theme.dart';
 import 'package:kareem_portfolio/constants/sizes.dart';
 import 'package:kareem_portfolio/widgets/contact_section.dart';
 import 'package:kareem_portfolio/widgets/footer_section.dart';
@@ -9,6 +10,7 @@ import 'package:kareem_portfolio/widgets/main_desktop.dart';
 import 'package:kareem_portfolio/widgets/main_mobile.dart';
 import 'package:kareem_portfolio/widgets/mobile_drawer.dart';
 import 'package:kareem_portfolio/widgets/projects_section.dart';
+import 'package:kareem_portfolio/widgets/scroll_reveal.dart';
 import 'package:kareem_portfolio/widgets/skills_desktop.dart';
 import 'package:kareem_portfolio/widgets/skills_mobile.dart';
 import 'package:sizer/sizer.dart';
@@ -81,24 +83,28 @@ class _HomePageState extends State<HomePage> {
                 key: navBarKeys[1],
                 width: screenWidth,
                 color: CustomColor.bgLightk,
-                padding: EdgeInsets.fromLTRB(25, 20, 25, 60),
+                padding: const EdgeInsets.fromLTRB(25, 20, 25, 60),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      'What I can do',
-                      style: TextStyle(
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.bold,
-                          color: CustomColor.whitePrimary),
+                    ScrollReveal(
+                      direction: RevealDirection.fromBottom,
+                      child: ShaderMask(
+                        shaderCallback: (bounds) =>
+                            CustomColor.primaryGradient.createShader(bounds),
+                        child: Text(
+                          'What I Can Do',
+                          style: AppTheme.headlineLarge.copyWith(
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
                     ),
-                    SizedBox(
-                      height: 50,
-                    ),
+                    const SizedBox(height: 50),
                     if (Constraints.maxWidth >= kMedDisktopWidth)
-                      SkillsDeskTop()
+                      const SkillsDeskTop()
                     else
-                      SkillsMobile()
+                      const SkillsMobile()
                   ],
                 ),
               ),

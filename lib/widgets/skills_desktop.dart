@@ -1,9 +1,12 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:kareem_portfolio/constants/app_colors.dart';
+import 'package:kareem_portfolio/constants/app_theme.dart';
 import 'package:kareem_portfolio/constants/skills_items.dart';
+import 'package:kareem_portfolio/widgets/scroll_reveal.dart';
 import 'package:kareem_portfolio/widgets/skills_languages.dart';
-import 'package:visibility_detector/visibility_detector.dart';
 
 class SkillsDeskTop extends StatefulWidget {
   const SkillsDeskTop({super.key});
@@ -12,100 +15,142 @@ class SkillsDeskTop extends StatefulWidget {
   SkillsDeskTopState createState() => SkillsDeskTopState();
 }
 
-class SkillsDeskTopState extends State<SkillsDeskTop>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<Offset> _slideAnimation;
-  late Animation<double> _fadeAnimation;
-  bool _isAnimated = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: Duration(milliseconds: 800),
-    );
-
-    _slideAnimation = Tween<Offset>(
-      begin: Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
-
-    _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(_controller);
-  }
-
-  void _startAnimation() {
-    if (!_isAnimated) {
-      setState(() {
-        _isAnimated = true;
-      });
-      _controller.forward();
-    }
-  }
+class SkillsDeskTopState extends State<SkillsDeskTop> {
+  int? _hoveredIndex;
 
   @override
   Widget build(BuildContext context) {
-    return VisibilityDetector(
-      key: Key("skills-section-desktop"),
-      onVisibilityChanged: (visibilityInfo) {
-        if (visibilityInfo.visibleFraction > 0.2) {
-          _startAnimation();
-        }
-      },
-      child: FadeTransition(
-        opacity: _fadeAnimation,
-        child: SlideTransition(
-          position: _slideAnimation,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: 450),
-                child: Wrap(
-                  spacing: 5,
-                  runSpacing: 5,
-                  children: [
-                    for (int i = 0; i < platformItems.length; i++)
-                      AnimatedContainer(
-                        duration: Duration(milliseconds: 600),
-                        curve: Curves.easeInOut,
-                        width: 200,
-                        decoration: BoxDecoration(
-                          color: CustomColor.bgLight2,
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        child: ListTile(
-                          contentPadding: EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 10),
-                          leading: SvgPicture.asset(
-                            platformItems[i]["img"],
-                            width: 26,
-                          ),
-                          title: Text(platformItems[i]["title"]),
-                        ),
-                      )
-                  ],
-                ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Platform Cards
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 480),
+          child: Wrap(
+            spacing: 16,
+            runSpacing: 16,
+            children: List.generate(
+              platformItems.length,
+              (index) => ScrollReveal(
+                direction: RevealDirection.scale,
+                delay: Duration(milliseconds: 100 * index),
+                child: _buildPlatformCard(index),
               ),
-              SizedBox(width: 50),
-              Flexible(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: 430),
-                  child: SkillsLanguages(),
-                ),
-              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 60),
+        // Skills Languages
+        Flexible(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 450),
+            child: const SkillsLanguages(),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPlatformCard(int index) {
+    final isHovered = _hoveredIndex == index;
+    final item = platformItems[index];
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hoveredIndex = index),
+      onExit: (_) => setState(() => _hoveredIndex = null),
+      child: AnimatedContainer(
+        duration: AppTheme.durationNormal,
+        curve: AppTheme.curveDefault,
+        width: 220,
+        height: 100,
+        decoration: BoxDecoration(
+          borderRadius: AppTheme.radiusLg,
+          gradient: LinearGradient(
+            colors: [
+              CustomColor.bgLight2,
+              CustomColor.bgLightk,
             ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          border: Border.all(
+            color: isHovered ? CustomColor.glassBorder : Colors.transparent,
+            width: 1.5,
+          ),
+          boxShadow: isHovered
+              ? [
+                  ...AppTheme.shadowLg,
+                  BoxShadow(
+                    color: CustomColor.glowBlue.withOpacity(0.3),
+                    blurRadius: 20,
+                    spreadRadius: 2,
+                  ),
+                ]
+              : AppTheme.shadowMd,
+        ),
+        child: ClipRRect(
+          borderRadius: AppTheme.radiusLg,
+          child: BackdropFilter(
+            filter: ImageFilter.blur(
+              sigmaX: isHovered ? 5 : 0,
+              sigmaY: isHovered ? 5 : 0,
+            ),
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: isHovered
+                    ? LinearGradient(
+                        colors: [
+                          CustomColor.glassBg,
+                          Colors.transparent,
+                        ],
+                      )
+                    : null,
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      gradient: CustomColor.accentGradient,
+                      borderRadius: AppTheme.radiusMd,
+                      boxShadow: isHovered
+                          ? [
+                              BoxShadow(
+                                color: CustomColor.accentBlue.withOpacity(0.4),
+                                blurRadius: 12,
+                                spreadRadius: 2,
+                              ),
+                            ]
+                          : [],
+                    ),
+                    padding: const EdgeInsets.all(12),
+                    child: SvgPicture.asset(
+                      item["img"],
+                      colorFilter: const ColorFilter.mode(
+                        Colors.white,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  // Title
+                  Expanded(
+                    child: Text(
+                      item["title"],
+                      style: AppTheme.titleMedium.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
   }
 }
